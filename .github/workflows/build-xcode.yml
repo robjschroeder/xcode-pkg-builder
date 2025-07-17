@@ -1,0 +1,28 @@
+name: Build Xcode Installer
+
+on:
+  workflow_dispatch:
+    inputs:
+      xip_file:
+        description: "Xcode .xip file (must be uploaded to repo or linked)"
+        required: true
+        default: "xcode/Xcode_16.4.xip"
+
+jobs:
+  build-pkg:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v4
+
+    - name: Run build script
+      run: |
+        chmod +x scripts/build-xcode-pkg.sh
+        ./scripts/build-xcode-pkg.sh ${{ github.event.inputs.xip_file }}
+
+    - name: Upload .pkg artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: xcode-pkg
+        path: ~/Desktop/Xcode*.pkg
